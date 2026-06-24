@@ -1,0 +1,262 @@
+/* animations.css — all keyframes & motion.
+   Every non-trivial animation is gated behind
+   @media (prefers-reduced-motion: no-preference). */
+
+/* ── Keyframes ─────────────────────────────────────────────────────────────── */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes meshDrift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(3%, -4%, 0) scale(1.08);
+  }
+  66% {
+    transform: translate3d(-3%, 3%, 0) scale(0.96);
+  }
+}
+
+/* PixelOS "Monet" morphing blobs: organic border-radius + drift + scale. */
+@keyframes blobMorph {
+  0%,
+  100% {
+    border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    border-radius: 58% 42% 38% 62% / 63% 38% 62% 37%;
+    transform: translate3d(5%, -4%, 0) scale(1.1);
+  }
+  66% {
+    border-radius: 38% 62% 56% 44% / 49% 61% 39% 51%;
+    transform: translate3d(-4%, 5%, 0) scale(0.94);
+  }
+}
+
+/* Living Monet color: gentle hue oscillation across the whole mesh. */
+@keyframes monetHue {
+  0%,
+  100% {
+    filter: hue-rotate(0deg) saturate(1);
+  }
+  50% {
+    filter: hue-rotate(10deg) saturate(1.06);
+  }
+}
+
+@keyframes particleDrift {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--p-opacity, 0.5);
+  }
+  90% {
+    opacity: var(--p-opacity, 0.5);
+  }
+  100% {
+    transform: translateY(-120px) translateX(20px);
+    opacity: 0;
+  }
+}
+
+@keyframes pulseDot {
+  0% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(52, 211, 153, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+  }
+}
+
+@keyframes pulseRing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--accent-1-rgb), 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(var(--accent-1-rgb), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--accent-1-rgb), 0);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes spinSlow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Reveal-on-scroll base state ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  [data-reveal].is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  [data-reveal="left"] {
+    transform: translateX(-40px);
+  }
+
+  [data-reveal="right"] {
+    transform: translateX(40px);
+  }
+
+  [data-reveal="left"].is-visible,
+  [data-reveal="right"].is-visible {
+    transform: translateX(0);
+  }
+
+  [data-reveal="scale"] {
+    transform: scale(0.92);
+  }
+
+  [data-reveal="scale"].is-visible {
+    transform: scale(1);
+  }
+
+  /* Hero sequential load */
+  .hero [data-load] {
+    opacity: 0;
+    animation: fadeInUp 0.8s var(--ease-out) forwards;
+    animation-delay: var(--load-delay, 0ms);
+  }
+
+  /* Animated mesh + particles */
+  .hero-mesh {
+    animation: monetHue 26s ease-in-out infinite;
+  }
+  .hero-mesh span {
+    animation: blobMorph 24s ease-in-out infinite;
+  }
+  .hero-mesh span:nth-child(2) {
+    animation-duration: 28s;
+  }
+  .hero-mesh span:nth-child(3) {
+    animation-duration: 32s;
+  }
+  .hero-mesh span:nth-child(4) {
+    animation-duration: 26s;
+  }
+  .hero-particles .particle {
+    animation: particleDrift var(--p-duration, 14s) linear infinite;
+    animation-delay: var(--p-delay, 0s);
+  }
+
+  .scroll-indicator__mouse {
+    animation: bounce 1.8s ease-in-out infinite;
+  }
+
+  .availability-dot {
+    animation: pulseDot 2s infinite;
+  }
+
+  .timeline-dot.is-current {
+    animation: pulseRing 2.2s infinite;
+  }
+
+  .typewriter-cursor {
+    animation: blink 1s step-end infinite;
+  }
+
+  .gradient-ring {
+    background-size: 200% 200%;
+    animation: gradientShift 6s ease infinite;
+  }
+}
+
+/* Reduced-motion: reveal everything immediately. */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  .hero [data-load] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Ripple element (created by JS) */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  background: rgba(255, 255, 255, 0.45);
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ripple {
+    animation: ripple 0.6s var(--ease-out);
+  }
+}
