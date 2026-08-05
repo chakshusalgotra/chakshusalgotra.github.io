@@ -8,9 +8,11 @@
 (function () {
   "use strict";
 
-  const { RESUME, LANGUAGE_COLORS, CATEGORY_COLORS, BLOG } = window.PORTFOLIO_DATA;
+  const { RESUME, LANGUAGE_COLORS, CATEGORY_COLORS } = window.PORTFOLIO_DATA;
   // GITHUB is mutable: the live fetch (js/github.js) can swap it in at runtime.
   let GITHUB = window.PORTFOLIO_DATA.GITHUB;
+  // BLOG is mutable: the live fetch (js/medium.js) can swap it in at runtime.
+  let BLOG = window.PORTFOLIO_DATA.BLOG;
 
   // ── Helpers ────────────────────────────────────────────────────────────────
   const $ = (sel) => document.querySelector(sel);
@@ -651,7 +653,7 @@
             <h3 class="blog-card__title">${esc(p.title)}</h3>
             <p class="blog-card__summary">${esc(p.summary)}</p>
             <div class="project-card__topics">
-              ${p.tags.map((t) => `<span class="topic-tag">#${esc(t)}</span>`).join("")}
+              ${(p.tags || []).map((t) => `<span class="topic-tag">#${esc(t)}</span>`).join("")}
             </div>
             <a class="blog-card__link" href="${esc(
               p.url
@@ -679,6 +681,15 @@
     const repoStat = document.querySelector('[data-stat="repos"] .stat__num');
     if (repoStat) repoStat.textContent = String(data.publicRepos);
     if (typeof window.PortfolioAfterGitHub === "function") window.PortfolioAfterGitHub();
+  };
+
+  // Live Medium refresh: swap in freshly-fetched posts and re-render writing.
+  window.PortfolioUpdateBlog = function (data) {
+    if (!data) return;
+    BLOG = data;
+    window.PORTFOLIO_DATA.BLOG = data;
+    renderBlog();
+    if (typeof window.PortfolioAfterBlog === "function") window.PortfolioAfterBlog();
   };
 
   // Expose a single render entry point.

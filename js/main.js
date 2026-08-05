@@ -31,6 +31,7 @@
     initActiveSection();
     initCursor();
     initLiveGitHub();
+    initLiveMedium();
   }
 
   // ── Theme ──────────────────────────────────────────────────────────────────
@@ -445,6 +446,21 @@
       .PortfolioLoadGitHub()
       .then((data) => {
         if (data && window.PortfolioUpdateGitHub) window.PortfolioUpdateGitHub(data);
+      })
+      .catch(() => {});
+  }
+
+  // ── Live Medium refresh ─────────────────────────────────────────────────────
+  // Pulls the latest RSS posts at runtime and keeps the static snapshot on error.
+  function initLiveMedium() {
+    if (!window.PortfolioLoadMedium) return;
+    window.PortfolioAfterBlog = function () {
+      if (window.PortfolioObserveReveals) window.PortfolioObserveReveals();
+    };
+    window
+      .PortfolioLoadMedium()
+      .then((data) => {
+        if (data && window.PortfolioUpdateBlog) window.PortfolioUpdateBlog(data);
       })
       .catch(() => {});
   }

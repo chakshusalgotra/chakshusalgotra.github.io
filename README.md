@@ -19,7 +19,7 @@ résumé and a snapshot of the GitHub public API.
 | **Experience** | Vertical timeline that draws in on scroll, alternating cards, calculated durations, impact bullets, color-coded tech pills, pulsing dot on the current role. |
 | **Projects** | Featured repo hero with language-breakdown bar, plus a bento grid of repos with stars/forks/relative-time, topic tags, and filter bar (All / Most Stars / Recent / by language). |
 | **Education & Achievements** | Education cards on the left; real, metric-driven achievements on the right (in place of certifications, which the résumé did not list). |
-| **Writing** | Latest Medium posts as cards (title, summary, tags, date) with a "Read more on Medium" CTA. Edit `BLOG.posts` in `js/data.js`. |
+| **Writing** | Latest Medium posts fetched automatically from the RSS feed as cards (title, summary, tags, date), with a static offline fallback and a "Read more on Medium" CTA. |
 | **Contact** | Clickable contact-method cards (Email · LinkedIn · GitHub · Medium · Phone) + a pure-HTML/CSS form with floating labels, inline validation, and a `mailto:` submit. |
 | **Footer** | Brand, quick nav, social icons (GitHub · LinkedIn · LeetCode · Medium · Email), dynamic copyright year, and a back-to-top button. |
 
@@ -38,6 +38,7 @@ résumé and a snapshot of the GitHub public API.
 ├── js/
 │   ├── data.js           # ← Résumé data + GitHub fallback snapshot + config
 │   ├── github.js         # Live GitHub API fetch (auto-updates repos) + caching
+│   ├── medium.js         # Live Medium RSS fetch (auto-updates posts) + caching
 │   ├── render.js         # DOM rendering functions
 │   ├── animations.js     # Scroll observers, typewriter, count-up, ripple
 │   └── main.js           # Init, theme, nav, filters, form, cursor, live refresh
@@ -91,7 +92,9 @@ Everything the site renders comes from [`js/data.js`](js/data.js):
   but if the API is unreachable or rate-limited it renders this snapshot instead.
   Curated `summary` / `topics` / `languages` here are also reused for matching live
   repos so known projects keep their hand-written blurbs.
-- **`BLOG`** — Medium profile URL + `posts[]` (title, url, date, summary, tags).
+- **`BLOG`** — Medium profile URL + a fallback `posts[]` snapshot used when the
+  live feed is unavailable.
+- **`BLOG_CONFIG`** — automatic Medium RSS fetching, post limit, and cache settings.
 - **`CONTACT`** — set `endpoint` to a [Formspree](https://formspree.io) or
   [Getform](https://getform.io) URL (e.g. `https://formspree.io/f/abcdwxyz`) to receive
   contact-form submissions **directly in your inbox**. Leave it `""` to use the
@@ -126,6 +129,28 @@ How it works:
 
 > Want all repos including forks? Set `includeForks: true`. Want to go back to a
 > fixed snapshot? Set `liveFetch: false`.
+
+### 🔄 Live Medium posts (auto-updates)
+
+The Writing section fetches the Medium RSS feed automatically during page startup,
+so newly published posts appear without editing `BLOG.posts`. Medium does not expose
+its RSS feed with browser CORS headers, so [`js/medium.js`](js/medium.js) reads it
+through the configured RSS-to-JSON endpoint and normalizes each item for the cards.
+
+```js
+const BLOG_CONFIG = {
+  username: "chakshu-salgotra",
+  feedUrl: "https://medium.com/feed/@chakshu-salgotra",
+  apiUrl: "https://api.rss2json.com/v1/api.json?rss_url=",
+  liveFetch: true,       // false → use only the static BLOG snapshot
+  maxPosts: 6,           // latest posts to display; 0 = all feed items
+  cacheMinutes: 30,      // reuse a fetched result within the browser session
+};
+```
+
+Results are sorted newest-first and cached in `sessionStorage`. If the feed, proxy,
+or network is unavailable, the site keeps the static `BLOG.posts` snapshot already
+rendered on screen.
 
 > Skill icons use the [Devicon](https://devicon.dev) class names (e.g.
 > `devicon-python-plain colored`). Any skill with `icon: null` automatically falls

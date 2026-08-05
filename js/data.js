@@ -399,6 +399,17 @@ const BLOG = {
   ],
 };
 
+// Live Medium fetch configuration (see js/medium.js).
+// The static BLOG posts above remain as an offline fallback.
+const BLOG_CONFIG = {
+  username: "chakshu-salgotra",
+  feedUrl: "https://medium.com/feed/@chakshu-salgotra",
+  apiUrl: "https://api.rss2json.com/v1/api.json?rss_url=",
+  liveFetch: true,
+  maxPosts: 6,
+  cacheMinutes: 30,
+};
+
 // Live GitHub fetch configuration (see js/github.js).
 //  - liveFetch: pull repos from the GitHub API at runtime so new repos auto-appear.
 //  - includeForks: set true to also show forked repos.
@@ -421,4 +432,13 @@ const CONTACT = {
   endpoint: "https://formspree.io/f/mbdvdjnl ",
 };
 
-window.PORTFOLIO_DATA = { RESUME, GITHUB, GITHUB_CONFIG, CONTACT, LANGUAGE_COLORS, CATEGORY_COLORS, BLOG };
+window.PORTFOLIO_DATA = {
+  RESUME,
+  GITHUB,
+  GITHUB_CONFIG,
+  BLOG,
+  BLOG_CONFIG,
+  CONTACT,
+  LANGUAGE_COLORS,
+  CATEGORY_COLORS,
+};
